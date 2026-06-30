@@ -1,0 +1,211 @@
+# Admin seeding
+mutation SeedAdmin {
+  createAdminForDemo(email: "admin@airport.com", password: "password123") {
+    id
+    email
+    role
+  }
+}
+
+# Login
+mutation Login {
+  login(input: {
+    email: "admin@airport.com"
+    password: "password123"
+  }) {
+    token
+    user {
+      id
+      email
+      role
+    }
+  }
+}
+
+# Passenger Registration
+mutation RegisterPassenger {
+  registerPassenger(input: {
+    email: "passenger@gmail.com"
+    password: "passengerpassword"
+    name: "John Doe"
+    passportNumber: "A12345678"
+    nationality: "Egyptian"
+  }) {
+    token
+    user {
+      id
+      email
+      role
+    }
+  }
+}
+
+# Airports
+mutation CreateJFK {
+  createAirport(input: {
+    code: "JFK"
+    name: "John F. Kennedy International Airport"
+    city: "New York"
+    country: "USA"
+  }) {
+    id
+    code
+  }
+}
+
+mutation CreateCAI {
+  createAirport(input: {
+    code: "CAI"
+    name: "Cairo International Airport"
+    city: "Cairo"
+    country: "Egypt"
+  }) {
+    id
+    code
+  }
+}
+
+query GetAirports {
+  airports {
+    id
+    code
+    name
+  }
+}
+
+# Flights
+mutation CreateFlight {
+  createFlight(input: {
+    flightNumber: "MS986"
+    departureAirportId: "PASTE_JFK_UUID_HERE"
+    destinationAirportId: "PASTE_CAI_UUID_HERE"
+    departureTime: "2026-07-15T10:00:00Z"
+    arrivalTime: "2026-07-15T22:30:00Z"
+    airline: "EgyptAir"
+    availableSeats: 150
+  }) {
+    id
+    flightNumber
+    availableSeats
+  }
+}
+
+query GetFlights {
+  flights(
+    limit: 5
+    offset: 0
+    filter: {
+      airline: "EgyptAir"
+      destinationAirportCode: "CAI"
+    }
+  ) {
+    total
+    items {
+      id
+      flightNumber
+      departureTime
+      departureAirport {
+        code
+      }
+      destinationAirport {
+        code
+      }
+    }
+  }
+}
+
+# Staff
+mutation CreateStaffPilot {
+  createStaff(input: {
+    email: "pilot@airport.com"
+    password: "pilotpassword"
+    name: "Capt. Sherif"
+    employeeId: "EMP-PILOT-01"
+    role: PILOT
+  }) {
+    id
+    name
+    role
+  }
+}
+
+mutation AssignStaff {
+  assignStaffToFlight(
+    staffId: "PASTE_STAFF_UUID_HERE"
+    flightId: "PASTE_FLIGHT_UUID_HERE"
+  ) {
+    id
+    name
+    assignedFlight {
+      flightNumber
+    }
+  }
+}
+
+# Bookings
+mutation BookFlight {
+  bookFlight(
+    flightId: "PASTE_FLIGHT_UUID_HERE"
+    seatNumber: "12A"
+  ) {
+    id
+    seatNumber
+    flight {
+      flightNumber
+    }
+  }
+}
+
+query MyBookings {
+  myBookings {
+    id
+    seatNumber
+    flight {
+      flightNumber
+      departureTime
+    }
+  }
+}
+
+# Baggage
+mutation RegisterBaggage {
+  registerBaggage(input: {
+    passengerId: "PASTE_PASSENGER_UUID_HERE"
+    flightId: "PASTE_FLIGHT_UUID_HERE"
+    tagNumber: "BAG-MS986-778"
+    weight: 23.5
+  }) {
+    id
+    tagNumber
+    status
+  }
+}
+
+mutation UpdateBaggage {
+  updateBaggageStatus(input: {
+    id: "PASTE_BAGGAGE_UUID_HERE"
+    status: IN_TRANSIT
+  }) {
+    id
+    status
+  }
+}
+
+# Subscriptions
+mutation UpdateFlightStatus {
+  updateFlightStatus(
+    id: "PASTE_FLIGHT_UUID_HERE"
+    status: DELAYED
+  ) {
+    id
+    status
+  }
+}
+
+subscription OnFlightStatusChange {
+  flightStatusUpdated(flightId: "PASTE_FLIGHT_UUID_HERE") {
+    id
+    flightNumber
+    status
+  }
+}
